@@ -17,6 +17,7 @@ ENTRY = (
 )
 
 MAX_CHARS = 200
+MAX_BYTES = 600
 
 
 def main() -> int:
@@ -27,6 +28,15 @@ def main() -> int:
     if len(text) > MAX_CHARS:
         print("entry is %d chars, over the %d limit" % (len(text), MAX_CHARS),
               file=sys.stderr)
+        return 1
+    try:
+        encoded_len = len(text.encode("utf-8"))
+    except UnicodeEncodeError as exc:
+        print("entry is not valid UTF-8: %s" % exc, file=sys.stderr)
+        return 1
+    if encoded_len > MAX_BYTES:
+        print("entry is %d bytes, over the %d-byte limit"
+              % (encoded_len, MAX_BYTES), file=sys.stderr)
         return 1
     if "\n" in text or "\r" in text:
         print("entry must be exactly one line", file=sys.stderr)
